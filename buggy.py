@@ -26,6 +26,56 @@ PAGE_SKEL = """
   </body>
 </html>
 """
+FORMS = """
+<h2>Break down results by mailing</h2>
+<form action="" method="GET">
+  <input type="hidden" name="breakdown_type" value="mailing">
+  <label>
+    Mailings (pick at least two):
+    <select name="mailings" multiple>
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+    </select>
+  </label>
+</form>
+
+<h2>Break down results by subject(s)/variation(s)</h2>
+<form action="" method="GET">
+  <div>
+    <label>
+      Breakdown type:
+      <select name="breakdown_type">
+        <option value="subject">Subject line</option>
+        <option value="subject_and_variation">Subject line and content variation</option>
+      </select>
+    </label>
+  </div>
+
+  <div>
+    <label>
+      Mailing:
+      <select name="mailing">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+      </select>
+    </label>
+  </div>
+  
+  <div>
+    <label>
+      Number of subjects: <input type="text" size="2" name="subject_count"> (if applicable)
+    </label>
+  </div>
+  
+  <div>
+    <label>
+      Number of variations: <input type="text" size="2" name="variation_count"> (if applicable)
+    </label>
+  </div>
+</form>
+"""
 TBL_HEAD,TBL_FOOT = ("""
 <table>
   <thead>
@@ -44,6 +94,9 @@ TBL_HEAD,TBL_FOOT = ("""
   </tbody>
 </table>
 """)
+
+def forms_html(query_string_args):
+    return PAGE_SKEL % FORMS
 
 def breakdown_html(query_string_args):
     """
