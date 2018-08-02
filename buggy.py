@@ -38,6 +38,8 @@ FORMS = """
       <option>3</option>
     </select>
   </label>
+  
+  <input type="submit">
 </form>
 
 <h2>Break down results by subject(s)/variation(s)</h2>
@@ -74,6 +76,8 @@ FORMS = """
       Number of variations: <input type="text" size="2" name="variation_count"> (if applicable)
     </label>
   </div>
+  
+  <input type="submit">
 </form>
 """
 TBL_HEAD,TBL_FOOT = ("""
