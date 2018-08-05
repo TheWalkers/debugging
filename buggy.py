@@ -1,20 +1,12 @@
-#!/bin/env python2.7
+#!/usr/bin/python2.7
 """
-For the debugging question. Assume this is run from a long-running Web 
-server process; functions will be called many times.
-
-This file doesn't at all represent our normal code or UI style, but it *is*
-supposed to handle even malformed or malicious input without:
-
-    - inaccurate error messages,
-    - security vulnerabilities, or
-    - crashes
-
-Your task is to look for the bug from the question, but it can't hurt to 
-note other places it falls short of that.
+Broken code for the debugging question.  This runs a server on port 8080 if
+you run it at the command line.
 """
 
 from cgi import escape
+import BaseHTTPServer
+import urlparse
 
 PAGE_SKEL = """
 <!DOCTYPE html>
@@ -30,14 +22,16 @@ FORMS = """
 <h2>Break down results by mailing</h2>
 <form action="" method="GET">
   <input type="hidden" name="breakdown_type" value="mailing">
-  <label>
-    Mailings (pick at least two):
-    <select name="mailings" multiple>
-      <option>1</option>
-      <option>2</option>
-      <option>3</option>
-    </select>
-  </label>
+  <div>
+    <label>
+      Mailings (pick at least two):<br />
+      <select name="mailings" multiple>
+        <option>1 - Here's a pretty cool subject hope y'all open</option>
+        <option>2 - This is something completely different</option>
+        <option>3 - Huge discounts limited time only</option>
+      </select>
+    </label>
+  </div>
   
   <input type="submit">
 </form>
@@ -58,9 +52,9 @@ FORMS = """
     <label>
       Mailing:
       <select name="mailing">
-        <option>1</option>
-        <option>2</option>
-        <option>3</option>
+        <option>1 - Here's a pretty cool subject hope y'all open</option>
+        <option>2 - This is something completely different</option>
+        <option>3 - Huge discounts limited time only</option>
       </select>
     </label>
   </div>
@@ -240,6 +234,41 @@ def _check_breakdown_args(breakdown_type, mailings, subject_count, variation_cou
         
         if not mailings:
             raise ValueError("No mailings specified")
+        
+        if len(mailings) < 2:
+            raise ValueError("You must compare at least two mailings")
 
     else:
         raise ValueError("Unknown report type '%s'" % breakdown_type)
+
+
+class BreakdownHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    def do_HEAD(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/html")
+        self.end_headers()
+    
+    def do_GET(self):
+        parsed = urlparse.urlparse(self.path)
+        if parsed.path != '/':
+            self.send_response(404)
+            self.send_header("Content-type", "text/html")
+            self.end_headers()
+            self.wfile.write('<h1>Not found</h1>')
+            return
+        self.do_HEAD()
+        query = parsed.query
+        args = urlparse.parse_qs(query)
+        if args:
+            resp = breakdown_html(args)
+        else:
+            resp = forms_html(args)
+        self.wfile.write(resp)
+
+def main():
+    print "Serving on :8080"
+    BaseHTTPServer.HTTPServer(('', 8080), BreakdownHandler).serve_forever()
+    
+if __name__ == '__main__':
+    main()
+
